@@ -61,11 +61,11 @@ function onWindowResize() {
 function bindEvents () {
   window.addEventListener("resize", onWindowResize);
   window.addEventListener("keydown", e => {
-    if (e.ctrlKey) { drawCommand = COMMANDS.draw; }
+    if (e.shiftKey) { drawCommand = COMMANDS.draw; }
     if (e.metaKey) { drawCommand = COMMANDS.erase; }
   });
   window.addEventListener("keyup", e => {
-    if (drawCommand == COMMANDS.draw && !e.ctrlKey) drawCommand = COMMANDS.none;
+    if (drawCommand == COMMANDS.draw && !e.shiftKey) drawCommand = COMMANDS.none;
     if (drawCommand == COMMANDS.erase && !e.metaKey) drawCommand = COMMANDS.none;
   });
   window.addEventListener("mousemove", e => {

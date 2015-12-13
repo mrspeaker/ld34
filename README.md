@@ -1,3 +1,3 @@
 # LD34 experiment - growing
 
-ctrl+mouse move to add hair.
+shift+mouse move to add hair.
