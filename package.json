@@ -1,0 +1,20 @@
+{
+  "name": "growing",
+  "version": "1.0.0",
+  "description": "grow hair: shift+mouse move to add",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo index.js --live -- -t [ babelify --presets [ es2015 react ] ]"
+  },
+  "author": "Mr Speaker",
+  "license": "ISC",
+  "devDependencies": {
+    "budo": "^7.0.2",
+    "babel-preset-react": "^6.1.18",
+    "babel-preset-es2015": "^6.1.18",
+    "babel-plugin-transform-class-properties": "^6.2.2"
+  },
+  "dependencies": {
+    "babelify": "^7.2.0"
+  }
+}

@@ -1,4 +1,4 @@
-(function() {
+const Maf = (function() {
 
     // Module code from underscore.js
 
@@ -64,7 +64,7 @@
     Maf.deg2Rad = function( degrees ) {
       return degrees * Math.PI / 180;
     };
-    
+
     Maf.toRadians = Maf.deg2Rad;
 
     // Converts from radians to degrees.
@@ -119,11 +119,11 @@
     // https://bocoup.com/weblog/find-the-closest-power-of-2-with-javascript
 
     Maf.closestPowerOfTwo = function( v ) {
-        return Math.pow( 2, Math.round( Math.log( v ) / Math.log( 2 ) ) ); 
+        return Math.pow( 2, Math.round( Math.log( v ) / Math.log( 2 ) ) );
     };
 
     Maf.nextPowerOfTwo = function( v ) {
-        return Math.pow( 2, Math.ceil( Math.log( v ) / Math.log( 2 ) ) );    
+        return Math.pow( 2, Math.ceil( Math.log( v ) / Math.log( 2 ) ) );
     }
 
     // http://stackoverflow.com/questions/1878907/the-smallest-difference-between-2-angles
@@ -173,7 +173,7 @@
     // http://www.iquilezles.org/www/articles/functions/functions.htm
 
     Maf.almostIdentity = function( x, m, n ) {
-        
+
         if( x > m ) return x;
 
         var a = 2 * n - m;
@@ -262,4 +262,8 @@
         return ( Math.abs( a - b ) < .0001 );
     }
 
+    return Maf;
+
 }());
+
+export default Maf;
