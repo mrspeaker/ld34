@@ -24,10 +24,12 @@ function update (hair, dt, t, onSpawn) {
   if (userData.life > userData.fallAge) {
     position.set(position.x, position.y - (Math.pow(userData.life, 4) / 25000) * dt, position.z);
     rotation.set(rotation.x + userData.fallRotateSpeed * dt, rotation.y, rotation.x);
+    scale.set(scale.x, Math.max(0, scale.y - 10 * dt), scale.z);
+    //console.log(scale.x.toFixed(2), scale.y.toFixed(2))
   }
 
   // Stop growing
-  if (userData.life > userData.fallAge - 5) {
+  if (userData.life > userData.growAge) {
     return;
   }
 
@@ -59,6 +61,7 @@ function make (parent, materials, time = 0) {
   h.sproutTime = h.generation + (Math.random() * 2);
   h.fallRotateSpeed = -(5 - Math.random() * 8) + 2;
   h.fallAge = Maf.randomInRange(18, 30);
+  h.growAge = Maf.randomInRange(h.fallAge * 0.5, h.fallAge);
 
   return mesh;
 }
@@ -67,8 +70,8 @@ function make (parent, materials, time = 0) {
 function position (mesh, point) {
   mesh.position.set(point.x, point.y, -0.1);
   const length = Math.random() * 0.01;
-  const xdepth = length / 5;
-  const zdepth = length / 1;
+  const xdepth = length * 20;
+  const zdepth = length * 20;
   mesh.scale.set(xdepth, length, zdepth);
 }
 
@@ -83,8 +86,8 @@ function getGeometry () {
   s.inc = 0.05;
   s.p0 = new THREE.Vector3(0, 0, 0);
   s.p1 = s.p0.clone().add(new THREE.Vector3(r(-0.2, 0.2), 0, 0));
-  s.p2 = s.p1.clone().add(new THREE.Vector3(r(-100.5, 100.5), -1, 0));
-  s.p3 = s.p2.clone().add(new THREE.Vector3(r(-100.2, 100.2), 0.1, -20));
+  s.p2 = s.p1.clone().add(new THREE.Vector3(r(-1, 1), -1, 0));
+  s.p3 = s.p2.clone().add(new THREE.Vector3(r(-1, 1), 0.1, r(0, -1)));
 
   s.calculate();
   s.calculateDistances();

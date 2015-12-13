@@ -51,7 +51,7 @@ const game = {
   world
 };
 
-game.dude.position.set(0.3, 0.56, 0.005);
+game.dude.position.set(0.3, 0.56, -0.09);
 
 function onWindowResize() {
   const {clientWidth:w, clientHeight:h} = container;
@@ -118,8 +118,11 @@ function addHairToWorld (hair) {
 
 function makeDude () {
   const geometry = new THREE.PlaneGeometry(7, 7, 16);
-  const texture = new THREE.TextureLoader().load("./assets/man.png");
-  const material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xffeeff});
+  const loader = new THREE.TextureLoader();
+  loader.crossOrigin = "";
+  const texture = loader.load("./assets/man.png");
+  //const texture = loader.load("http://i.imgur.com/0yPZxSP.jpg");
+  const material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xffeeff, map:texture});
   const plane = new THREE.Mesh(geometry, material);
   return plane;
 }
