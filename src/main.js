@@ -1,6 +1,9 @@
 "use strict";
 /*global THREE:false*/
 import Hairs from "./Hairs";
+import demo from "./demo";
+
+let noseHairs = demo.slice(0);
 
 window.addEventListener("load", () => {
   bindEvents();
@@ -45,6 +48,7 @@ const COMMANDS = {
 
 const game = {
   dude: addObjectToScene(makeDude()),
+  glasses: addObjectToScene(makeGlasses()),
   hairs: [],
   command: COMMANDS.none,
   mouse: new THREE.Vector2(0, 0),
@@ -52,6 +56,7 @@ const game = {
 };
 
 game.dude.position.set(0.3, 0.56, -0.09);
+game.glasses.position.set(0.75 , 1.05, -5.2);
 
 function onWindowResize() {
   const {clientWidth:w, clientHeight:h} = container;
@@ -122,7 +127,16 @@ function makeDude () {
   loader.crossOrigin = "";
   const texture = loader.load("./assets/man.png");
   //const texture = loader.load("http://i.imgur.com/0yPZxSP.jpg");
-  const material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, color: 0xffeeff, map:texture});
+  const material = new THREE.MeshBasicMaterial({side: THREE.DoubleSide, map:texture, transparent:true});
+  const plane = new THREE.Mesh(geometry, material);
+  return plane;
+}
+
+function makeGlasses () {
+  const geometry = new THREE.PlaneGeometry(3.5, 3.5, 16);
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load("./assets/glasses.png");
+  const material = new THREE.MeshBasicMaterial({map:texture, transparent:true});
   const plane = new THREE.Mesh(geometry, material);
   return plane;
 }
@@ -134,6 +148,7 @@ function spawnHair (parentUserData, position) {
   return addHairToWorld(mesh);
 }
 
+window.poop = [];
 function handleHairCommand () {
   const {camera, raycaster} = world;
   const {dude, mouse} = game;
@@ -144,6 +159,11 @@ function handleHairCommand () {
   case COMMANDS.draw:
     const intersects = raycaster.intersectObjects([dude], false);
     if (intersects.length > 0) {
+      window.poop.push({
+        time: world.clock.getElapsedTime(),
+        x: intersects[0].point.x,
+        y: intersects[0].point.y
+      });
       spawnHair(null, intersects[0].point);
     }
     break;
@@ -159,6 +179,14 @@ function tick () {
   const {clock, scene, renderer, controls, camera} = world;
   const dt = clock.getDelta();
   const t = clock.getElapsedTime();
+
+  if (noseHairs.length) {
+    if (noseHairs[0].time < t) {
+      spawnHair(null, noseHairs[0]);
+      noseHairs = noseHairs.slice(1);
+    }
+  }
+
   const {hairs} = game;
   controls.update();
 

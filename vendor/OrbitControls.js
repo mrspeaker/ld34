@@ -32,8 +32,8 @@
 
 		// How far you can orbit horizontally, upper and lower limits.
 		// If set, must be a sub-interval of the interval [ - Math.PI, Math.PI ].
-		this.minAzimuthAngle = - Infinity; // radians
-		this.maxAzimuthAngle = Infinity; // radians
+		this.minAzimuthAngle = - Infinity ; // radians
+		this.maxAzimuthAngle = Infinity ; // radians
 
 		// Set to true to enable damping (inertia)
 		// If damping is enabled, you must call controls.update() in your animation loop
