@@ -1,9 +1,7 @@
-"use strict";
 /*global THREE:false*/
 import Hairs from "./Hairs";
+import World from "./World";
 import demo from "./demo";
-
-let noseHairs = demo.slice(0);
 
 window.addEventListener("load", () => {
   bindEvents();
@@ -11,40 +9,13 @@ window.addEventListener("load", () => {
   tick();
 });
 
-const container = document.getElementById("container");
-
-const world = (() => {
-  const scene = new THREE.Scene();
-  const resolution = new THREE.Vector2(window.innerWidth, window.innerHeight);
-  const camera = new THREE.PerspectiveCamera(60, resolution.x / resolution.y, .1, 100);
-  camera.position.set(0, 0, -10);
-
-  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(resolution.x, resolution.y);
-  renderer.setPixelRatio(window.devicePixelRatio);
-  container.appendChild(renderer.domElement);
-
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  const clock = new THREE.Clock();
-  const raycaster = new THREE.Raycaster();
-
-  return {
-    scene,
-    resolution,
-    camera,
-    renderer,
-    clock,
-    controls,
-    raycaster
-  };
-})();
-
-
 const COMMANDS = {
   "none": "",
   "draw": "draw",
   "erase": "erase"
 };
+
+const world = World(document.getElementById("container"));
 
 const game = {
   dude: addObjectToScene(makeDude()),
@@ -52,15 +23,34 @@ const game = {
   hairs: [],
   command: COMMANDS.none,
   mouse: new THREE.Vector2(0, 0),
-  world
+  noseHairs: [...demo]
 };
 
 game.dude.position.set(0.3, 0.56, -0.09);
 game.glasses.position.set(0.75 , 1.05, -5.2);
 
+const hairMaterials = (({resolution, camera}) => {
+  const hairColors = [
+    0x443542, 0x533D46, 0x2F2432,
+    0x3C2E3B, 0x5D4951, 0x8C5D5D
+  ];
+  return hairColors.map(c => new THREE.MeshLineMaterial({
+    color: new THREE.Color(c),
+    opacity: 1,
+    resolution: resolution,
+    lineWidth: 6,
+    near: camera.near,
+    far: camera.far,
+    depthTest: true,
+    blending: THREE.NormalBlending,
+    sizeAttenuation: false,
+    side: THREE.DoubleSide
+  }));
+})(world);
+
 function onWindowResize() {
+  const {camera, renderer, resolution, container} = world;
   const {clientWidth:w, clientHeight:h} = container;
-  const {camera, renderer, resolution} = world;
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
 
@@ -80,36 +70,17 @@ function bindEvents () {
     if (command == COMMANDS.erase && !e.metaKey) game.command = COMMANDS.none;
   });
   window.addEventListener("mousemove", e => {
-    const {renderer} = world;
+    const {resolution} = world;
     const {mouse, command} = game;
-    mouse.x = (e.clientX / (renderer.domElement.width / window.devicePixelRatio)) * 2 - 1;
-    mouse.y = - (e.clientY / (renderer.domElement.height / window.devicePixelRatio)) * 2 + 1;
+
+    mouse.x = (e.clientX / resolution.x) * 2 - 1;
+    mouse.y = - (e.clientY / resolution.y) * 2 + 1;
 
     if (command !== COMMANDS.none) {
       handleHairCommand();
     }
   });
 }
-
-const hairMaterials = (() => {
-  const {resolution, camera} = world;
-  const hairColors = [
-    0x443542, 0x533D46, 0x2F2432,
-    0x3C2E3B, 0x5D4951, 0x8C5D5D
-  ];
-  return hairColors.map(c => new THREE.MeshLineMaterial({
-    color: new THREE.Color(c),
-    opacity: 1,
-    resolution: resolution,
-    lineWidth: 6,
-    near: camera.near,
-    far: camera.far,
-    depthTest: true,
-    blending: THREE.NormalBlending,
-    sizeAttenuation: false,
-    side: THREE.DoubleSide
-  }));
-})();
 
 function addObjectToScene (obj) {
   world.scene.add(obj);
@@ -148,7 +119,6 @@ function spawnHair (parentUserData, position) {
   return addHairToWorld(mesh);
 }
 
-window.poop = [];
 function handleHairCommand () {
   const {camera, raycaster} = world;
   const {dude, mouse} = game;
@@ -159,11 +129,6 @@ function handleHairCommand () {
   case COMMANDS.draw:
     const intersects = raycaster.intersectObjects([dude], false);
     if (intersects.length > 0) {
-      window.poop.push({
-        time: world.clock.getElapsedTime(),
-        x: intersects[0].point.x,
-        y: intersects[0].point.y
-      });
       spawnHair(null, intersects[0].point);
     }
     break;
@@ -173,30 +138,34 @@ function handleHairCommand () {
   }
 }
 
+// Demo nose hairs
+function doNoseHairs (t) {
+  let {noseHairs} = game;
+  if (noseHairs.length) {
+    if (noseHairs[0].time < t) {
+      spawnHair(null, noseHairs[0]);
+      game.noseHairs = noseHairs.slice(1);
+    }
+  }
+}
+
 function tick () {
   requestAnimationFrame(tick);
 
   const {clock, scene, renderer, controls, camera} = world;
+  const {hairs} = game;
+
   const dt = clock.getDelta();
   const t = clock.getElapsedTime();
-
-  if (noseHairs.length) {
-    if (noseHairs[0].time < t) {
-      spawnHair(null, noseHairs[0]);
-      noseHairs = noseHairs.slice(1);
-    }
-  }
-
-  const {hairs} = game;
   controls.update();
 
-  let doRemove = false;
-  hairs.forEach((hair) => {
+  doNoseHairs(t);
+
+  // Update all hairs
+  const doRemove = hairs.reduce((remove, hair) => {
     Hairs.update(hair, dt, t, spawnHair);
-    if (hair.userData.remove) {
-      doRemove = true;
-    }
-  });
+    return remove || hair.userData.remove;
+  }, false);
 
   if (doRemove) {
     game.hairs = hairs.filter(hair => {

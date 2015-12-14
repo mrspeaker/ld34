@@ -1,6 +1,6 @@
 *{ box-sizing: border-box; margin :0; padding: 0;}
 
-body{
+body {
   overflow: hidden;
   font-family: Lato, sans-serif;
   width: 100%;
@@ -11,7 +11,7 @@ body{
   font-size: 10pt;
 }
 
-#container{
+#container {
   position: absolute;
   left: 0;
   top: 0;
