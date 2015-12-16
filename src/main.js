@@ -42,9 +42,9 @@ const hairMaterials = (({resolution, camera}) => {
     near: camera.near,
     far: camera.far,
     depthTest: true,
-    blending: THREE.NormalBlending,
+    //blending: THREE.NormalBlending,
     sizeAttenuation: false,
-    side: THREE.DoubleSide
+    //side: THREE.DoubleSide
   }));
 })(world);
 
