@@ -1,7 +1,8 @@
-# LD34 experiment - growing
+# Body Hair Simulator 2k15
 
-shift+mouse move to add hair.
+[Grow online!](http://mrspeaker.github.io/ld34/). Shift+mouse move grow some hairs.
 
+![hairs](https://cloud.githubusercontent.com/assets/129330/11829707/8b0b2bec-a36c-11e5-994c-ef02f9d4a22e.png)
 
 ## Running
 
